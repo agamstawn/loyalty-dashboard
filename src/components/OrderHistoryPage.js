@@ -1,4 +1,4 @@
-// src/components/OrderHistoryPage.js
+import "../orders-history.css";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -9,7 +9,7 @@ const OrderHistoryPage = ({ customerId }) => {
 
   useEffect(() => {
     // Fetch customer's order history using Axios
-    axios.get(`http://localhost:3010/api/v1/customers/${customerId}/orders_last_year`)
+    axios.get(`http://localhost:3010/api/v1/customers/1/orders_last_year`)
       .then((response) => setOrders(response.data))
       .catch((error) => console.error('Error fetching order history:', error));
   }, [customerId]);
@@ -35,17 +35,25 @@ const OrderHistoryPage = ({ customerId }) => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div>
+    <div class="container-orders centered">
       <h1>Order History</h1>
-      <ul>
-        {currentOrders.map((order) => (
-          <li key={order.id}>
-            Order ID: {order.orderId}, Date: {order.date}, Total: ${order.totalInCents / 100}
-          </li>
+      <table class="table" id="customers">
+        <thead>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Total</th>
+        </thead>
+        <tbody>
+        {currentOrders.map((order) => (  
+          <tr>
+            <td>{order.orderId}</td>
+            <td>{order.date}</td>
+            <td>${order.totalInCents / 100}</td>
+          </tr>
         ))}
-      </ul>
-      {/* Pagination */}
-      <div>
+        </tbody>
+      </table>
+      <div class="pagination">
         {Array.from({ length: Math.ceil(orders.length / ordersPerPage) }, (_, index) => (
           <button key={index + 1} onClick={() => paginate(index + 1)}>
             {index + 1}
