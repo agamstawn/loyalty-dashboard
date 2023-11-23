@@ -1,14 +1,26 @@
 import "../customer-info.css";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; 
+import apiUrl from '../config';
+import qs from 'query-string';
 
-const CustomerInfoPage = ({ customerId }) => {
+const CustomerInfoPage = ({match, location}) => {
   const [customerInfo, setCustomerInfo] = useState(null);
-
+  let customerId = 0;
+  if (match.params){
+    customerId = match.params.customerId;
+  }
+  if (location.search){
+    customerId = qs.parse(location.search).customerId;
+  }
+  console.log(customerId, match.params.customerId, qs.parse(location.search).customerId, location);
   useEffect(() => {
+  // const {customerId} =  qs.parse(location.search) || match.params;
+  // console.log(customerId, location.search, match.params);
     // Fetch customer information using Axios
     // Update the URL with your actual endpoint
-    axios.get(`http://localhost:3010/api/v1/customers/1`)
+    axios.get(`${apiUrl}/customers/${customerId}`)
       .then((response) => setCustomerInfo(response.data))
       .catch((error) => console.error('Error fetching customer information:', error));
   }, [customerId]);
@@ -16,10 +28,9 @@ const CustomerInfoPage = ({ customerId }) => {
   if (!customerInfo) {
     return <div>Loading...</div>;
   }
-
+  
   // Calculate progress towards the next tier
-  const progressPercentage = (customerInfo.amount_spent_since_start_date / customerInfo.next_tier_amount) * 100;
-  // const progressPercentage = 10;
+  const progressPercentage = (customerInfo.amount_this_year / customerInfo.next_tier_amount) * 100;
 
   const progressBarStyle = {
     width: `${progressPercentage}%`,
@@ -29,10 +40,11 @@ const CustomerInfoPage = ({ customerId }) => {
   };
 
   return (
-    <div class="card centered">
-      <div class="container">
+    <div className="card centered">
+      <div className="container">
         <h1>Customer Information</h1>
-        <table class="centered">
+        <table className="centered">
+          <tbody>
           <tr>
             <td>Current Tier</td>
             <td>:</td>
@@ -58,6 +70,7 @@ const CustomerInfoPage = ({ customerId }) => {
             <td>:</td>
             <td> {customerInfo.downgrade_next_year}</td>
           </tr>
+          </tbody>
         </table>
         <p>Progress Towards Next Tier</p>
         <div style={{ border: '1px solid #ccc', borderRadius: '5px', overflow: 'hidden', marginTop: '10px' }}>
@@ -65,6 +78,7 @@ const CustomerInfoPage = ({ customerId }) => {
             <span> {progressPercentage.toFixed(2)}%</span>
           </div>
         </div>
+        <Link to={`/orders_since_last_year?customerId=${customerId}`}>Order History</Link>
       </div>
     </div>
   );
