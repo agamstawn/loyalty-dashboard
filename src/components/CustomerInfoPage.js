@@ -30,8 +30,14 @@ const CustomerInfoPage = ({match, location}) => {
   }
   
   // Calculate progress towards the next tier
-  const progressPercentage = (customerInfo.amount_this_year / customerInfo.next_tier_amount) * 100;
-
+  let progressPercentage = (customerInfo.amount_this_year / customerInfo.next_tier_amount) * 100;
+  
+  // For handling infinity progress precentage
+  if(customerInfo.next_tier_amount == 0){
+    progressPercentage = 100
+  }
+  console.log(customerInfo.amount_this_year, customerInfo.next_tier_amount);
+  
   const progressBarStyle = {
     width: `${progressPercentage}%`,
     backgroundColor: progressPercentage >= 100 ? 'green' : 'yellow',
